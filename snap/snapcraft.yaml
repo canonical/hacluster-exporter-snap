@@ -1,0 +1,80 @@
+name: hacluster-exporter
+title: HA Cluster Exporter
+summary: A Snap package for Prometheus HA Cluster Exporter
+base: core24
+
+adopt-info: hacluster-exporter
+
+issues: https://github.com/canonical/hacluster-exporter-snap/issues
+source-code: https://github.com/canonical/hacluster-exporter-snap
+website: https://snapcraft.io/hacluster-exporter
+
+license: Apache-2.0
+confinement: classic
+
+description: |
+  This snap includes ha_cluster_exporter to provide Pacemaker-based HA cluster
+  statistics via Prometheus. Grafana dashboards can then be used to visualize
+  the exported metrics.
+
+  **How-To**
+  ---
+
+  **How to install the snap:**
+
+     sudo snap install hacluster-exporter
+
+  The snap starts ha_cluster_exporter as a daemon automatically and exposes
+  metrics on `:9664/metrics` by default.
+
+  **How to use the service:**
+
+  Configure Prometheus to scrape `http://<cluster-node>:9664/metrics`.
+  For the most complete cluster visibility, run the snap on each cluster node.
+
+  The exporter inspects the local node on each scrape and exposes Pacemaker,
+  Corosync, SBD, and DRBD metrics when those components are available.
+
+  **Reference**
+  ---
+
+  Default runtime values:
+
+  - `web.listen-address`: the address on which the exporter exposes metrics.
+    The default is `:9664`.
+  - `web.telemetry-path`: the HTTP path on which metrics are exposed.
+    The default is `/metrics`.
+
+  This snap currently starts the exporter with the upstream defaults and does
+  not expose additional snap configuration options.
+
+  **Links**
+  ---
+  Upstream ha_cluster_exporter repository\
+  https://github.com/ClusterLabs/ha_cluster_exporter
+
+platforms:
+  amd64:
+  arm64:
+  s390x:
+  ppc64el:
+
+apps:
+  hacluster-exporter:
+    daemon: simple
+    command: bin/ha_cluster_exporter
+    plugs:
+      - network-bind
+
+parts:
+  hacluster-exporter:
+    plugin: go
+    build-snaps: [go/latest/stable]
+    source: https://github.com/ClusterLabs/ha_cluster_exporter
+    source-type: git
+    source-tag: 1.4.0
+    override-pull: |
+      craftctl default
+      TAG=$(git describe --tags)
+      SNAP_GIT_VERSION=$(git -C $CRAFT_PROJECT_DIR describe --always --dirty --abbrev=10)
+      craftctl set version="${TAG#v}+snap-${SNAP_GIT_VERSION}"
