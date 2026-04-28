@@ -1,0 +1,40 @@
+name: Publish Snap
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+
+  release:
+    name: Release snap
+    needs: build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact-name:
+          - snap_x86_64
+          - snap_aarch64
+          - snap_s390x
+          - snap_ppc64le
+    steps:
+      - name: Download built snap artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+
+      - name: Find downloaded snap file
+        run: echo 'SNAP_FILE<<EOF' >> "$GITHUB_ENV" && find . -name '*.snap' >> "$GITHUB_ENV" && echo 'EOF' >> "$GITHUB_ENV"
+
+      - name: Publish snap to latest/edge
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ env.SNAP_FILE }}
+          release: latest/edge
