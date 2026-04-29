@@ -1,9 +1,11 @@
 name: hacluster-exporter
 title: HA Cluster Exporter
-summary: A Snap package for Prometheus HA Cluster Exporter
+summary: Snap for Prometheus HA Cluster Exporter
 base: core24
 
 adopt-info: hacluster-exporter
+
+icon: snap/gui/icon.png
 
 issues: https://github.com/canonical/hacluster-exporter-snap/issues
 source-code: https://github.com/canonical/hacluster-exporter-snap
@@ -70,6 +72,7 @@ parts:
   hacluster-exporter:
     plugin: go
     build-snaps: [go/latest/stable]
+    build-attributes: [enable-patchelf]
     source: https://github.com/ClusterLabs/ha_cluster_exporter
     source-type: git
     source-tag: 1.4.0
