@@ -65,8 +65,6 @@ apps:
   hacluster-exporter:
     daemon: simple
     command: bin/ha_cluster_exporter
-    plugs:
-      - network-bind
 
 parts:
   hacluster-exporter:
