@@ -70,7 +70,6 @@ parts:
   hacluster-exporter:
     plugin: go
     build-snaps: [go/latest/stable]
-    build-attributes: [enable-patchelf]
     source: https://github.com/ClusterLabs/ha_cluster_exporter
     source-type: git
     source-tag: 1.4.0
